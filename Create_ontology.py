@@ -77,10 +77,10 @@ def create_ontology():
             continue
         president = country_infobox.xpath("//tr[th//a[text() = 'President']]/td//a/@href")
         prime_minister = country_infobox.xpath("//tr[th//a[text() = 'Prime Minister']]/td//a/@href")
-        #population = country_infobox.xpath("//tr[th[contains(., 'census')]]/td//text()")
-        #area = country_infobox.xpath("//tr[th[contains(., 'Total')]]/td//text()")
-        #gov = country_infobox.xpath("//tr[th[contains(., 'Government')]]/td//a/@href")
-        #capital = country_infobox.xpath("//tr[th[contains(., 'Capital')]]/td//a/@href")
+        population = country_infobox.xpath("//tr[th[contains(., 'census')]]/td//text()")
+        area = country_infobox.xpath("//tr[th[contains(., 'Total')]]/td//text()")
+        gov = country_infobox.xpath("//tr[th[contains(., 'Government')]]/td//a/@href")
+        capital = country_infobox.xpath("//tr[th[contains(., 'Capital')]]/td//a/@href")
 
 
 
@@ -144,7 +144,7 @@ def create_ontology():
                          place_entity = create_ontology_entity(prime_country)
                          ontology_graph.add(
                                            (place_entity, prime_entity, country_entity))
-        '''
+
         if len(population) > 0:
            entity = (population[0]).split(" ")[-1]
            name_entity = create_ontology_entity(entity)
@@ -175,7 +175,7 @@ def create_ontology():
                capital_entity = create_ontology_entity("capital_of")
                ontology_graph.add(
                     (name_entity, capital_entity, country_entity))
-        '''
+
     ontology_graph.serialize(ONTOLOGY_PATH, format="nt")
 
 

@@ -8,9 +8,9 @@ def main():
         if sys.argv[1] != "create":
             print("Wrong input!")
             return
-        #create_ontology()
+        create_ontology()
         # TODO: fix in the end
-        dummy_create_ontology()
+        #dummy_create_ontology()
         return
 
     if len(sys.argv) == 3:
