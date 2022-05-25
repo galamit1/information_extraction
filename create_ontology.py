@@ -82,11 +82,10 @@ def create_ontology():
         gov = country_infobox.xpath("//tr[th[contains(., 'Government')]]/td//a/@href")
         capital = country_infobox.xpath("//tr[th[contains(., 'Capital')]]/td//a/@href")
 
-
-
-        #if population == 0:
+        if len(population) == 0:
             # TODO: fix this option
-        #    population = country_infobox.xpath("//tr[th[contains(., 'estimate')]]/td//text()")
+           population = country_infobox.xpath("//tr[th[contains(., 'estimate')]]/td//text()")
+
         country_entity = create_ontology_entity(country)
 
         if len(president) > 0:
@@ -96,25 +95,24 @@ def create_ontology():
                 (name_entity, president_entity, country_entity))
 
             curr_president = get_page(president[0])
-
             if curr_president != -1:
-                    president_when_born = curr_president.xpath("//table//tr[th[text()='Born']]//span[@class='bday']//text()")
-                    president_where_born = curr_president.xpath("//tr[th[contains(., 'Born')]]/td//text()")
+                president_when_born = curr_president.xpath("//table//tr[th[text()='Born']]//span[@class='bday']//text()")
+                president_where_born = curr_president.xpath("//tr[th[contains(., 'Born')]]/td//text()")
 
-                    if len(president_when_born) > 0:
-                         president_when_born = president_when_born[0]
-                         date_entity = create_ontology_entity(president_when_born)
-                         president_entity = create_ontology_entity("president_when_born")
-                         ontology_graph.add(
-                               (date_entity, president_entity, country_entity))
+                if len(president_when_born) > 0:
+                     president_when_born = president_when_born[0]
+                     date_entity = create_ontology_entity(president_when_born)
+                     president_entity = create_ontology_entity("president_when_born")
+                     ontology_graph.add(
+                           (date_entity, president_entity, country_entity))
 
-                    if len(president_where_born) > 0:
-                         president_country = [x for x in president_where_born if re.search('[a-zA-Z]', str(x))][-1]
-                         president_country = "_".join(re.findall("[a-zA-Z]+", president_country))
-                         president_entity = create_ontology_entity("president_where_born")
-                         place_entity = create_ontology_entity(president_country)
-                         ontology_graph.add(
-                                           (place_entity, president_entity, country_entity))
+                if len(president_where_born) > 0:
+                     president_country = [x for x in president_where_born if re.search('[a-zA-Z]', str(x))][-1]
+                     president_country = "_".join(re.findall("[a-zA-Z]+", president_country))
+                     president_entity = create_ontology_entity("president_where_born")
+                     place_entity = create_ontology_entity(president_country)
+                     ontology_graph.add(
+                                       (place_entity, president_entity, country_entity))
 
 
 
@@ -151,7 +149,7 @@ def create_ontology():
            population_entity = create_ontology_entity("population_of")
            ontology_graph.add(
                 (name_entity, population_entity, country_entity))
-        
+
         if len(area) > 0:
            area = area[0]
            area = (area.split(' '))[0]
@@ -162,14 +160,14 @@ def create_ontology():
            area_entity = create_ontology_entity("area_of")
            ontology_graph.add(
                 (name_entity, area_entity, country_entity))
-        
+
         if len(gov) > 0:
            for i in gov:
                name_entity = create_ontology_entity(i)
                gov_entity = create_ontology_entity("government_in")
                ontology_graph.add(
                     (name_entity, gov_entity, country_entity))
-        
+
         if len(capital) > 0:
                name_entity = create_ontology_entity(capital[0])
                capital_entity = create_ontology_entity("capital_of")

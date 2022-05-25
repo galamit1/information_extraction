@@ -1,6 +1,5 @@
 import sys
-from Answer_question import *
-
+from answer_question import *
 
 
 def main():
@@ -17,7 +16,7 @@ def main():
         if sys.argv[1] != "question":
             print("Wrong input!")
             return
-        answer_question(sys.argv[2])
+        print(answer_question(sys.argv[2]))
         return
 
     print("Wrong input!")
