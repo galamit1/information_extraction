@@ -104,10 +104,16 @@ def specific_question(question):
 
 def broad_question(question, g):
     if re.search("List", question):
-        name = (question.split("?")[0]).split(" ")
-        name = "_".join(name[9:])
-        q = "select ?x where { ?e" + " <" + ONTOLOGY_PREFIX + "capital_of> ?x. " + " FILTER(regex(lcase(str(?e))," + "\"" + str(
-            name).lower() + "\"" + "))}"
+        if re.search("capital", question):
+            name = (question.split("?")[0]).split(" ")
+            name = "_".join(name[9:])
+            q = "select ?country where { ?capital" + " <" + ONTOLOGY_PREFIX + "capital_of> ?country. " + " FILTER(regex(lcase(str(?capital))," + "\"" + \
+                name.lower() + "\"" + "))}"
+        elif re.search("year", question):
+            name = (question.split("?")[0]).split(" ")
+            name = "_".join(name[9:])
+            q = "select ?country where { ?date" + " <" + ONTOLOGY_PREFIX + "president_when_born> ?country. " + " FILTER(regex(lcase(str(?date))," + "\"" + \
+                name + "-\"" + "))}"
 
     if re.search("Who", question):
         name = (question.split("?")[0]).split(" ")
