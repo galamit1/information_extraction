@@ -1,7 +1,5 @@
-import rdflib
 from create_ontology import *
 import re
-import copy
 
 LIST_OF_COUNTRIES_URL = "https://en.wikipedia.org/wiki/List_of_countries_by_population_(United_Nations)"
 WIKIPEDIA_URL_PREFIX = "https://en.wikipedia.org"
@@ -10,15 +8,17 @@ ONTOLOGY_PATH = "ontology.nt"
 
 
 def answer_question(question):
-    # TODO: input validity
     g = rdflib.Graph()
     g.parse("ontology.nt")
 
     question = str(question)
     question_type = str(((question.split()))[0])
     if question_type != "How" and question_type != "List":
-        if re.search("Who is", question) and not re.search("Who is the", question):
-            q = broad_question(question, g)
+        if re.search("Who", question):
+            if re.search("president", question) or re.search("prime", question):
+                q = specific_question(question)
+            else:
+                q = broad_question(question, g)
         else:
             q = specific_question(question)
     else:
@@ -30,11 +30,12 @@ def answer_question(question):
     if re.search("area", question):
         answer_for_question += " squared"
 
-    if re.search("Who is", question) and not re.search("Who is the", question):
-        if re.search("president", q):
-            answer_for_question = "President of " + answer_for_question
-        else:
-            answer_for_question = "Prime minister of " + answer_for_question
+    if re.search("Who is", question):
+        if not re.search("of", question):
+            if re.search("president", q):
+                answer_for_question = "President of " + answer_for_question
+            else:
+                answer_for_question = "Prime minister of " + answer_for_question
     if re.search("How", question):
         answer_for_question = len(query_result)
 
@@ -47,7 +48,6 @@ def get_final_result(query_result):
 
 
 def specific_question(question):
-    # TODO: dont forget slice all
     country = question.split()[-1].split("?")
     country = country[:-1]
     country = "_".join(country)
@@ -84,18 +84,18 @@ def specific_question(question):
                 country = (question.split("?")[0]).split(" ")
                 country = "_".join(country[5: -1])
                 attribute = "president_when_born>"
-            elif re.search("Where", question):
+            if re.search("Where", question):
                 country = (question.split("?")[0]).split(" ")
                 country = "_".join(country[5: -1])
                 attribute = "president_where_born>"
         else:
             if re.search("When", question):
                 country = (question.split("?")[0]).split(" ")
-                country = "_".join(country[5: -1])
+                country = "_".join(country[6: -1])
                 attribute = "prime_when_born>"
             elif re.search("Where", question):
                 country = (question.split("?")[0]).split(" ")
-                country = "_".join(country[5: -1])
+                country = "_".join(country[6: -1])
                 attribute = "prime_where_born>"
 
     q = "select ?e where { ?e" + " <" + ONTOLOGY_PREFIX + attribute + " " + " <" + ONTOLOGY_PREFIX + country + "> . }"
@@ -134,8 +134,6 @@ def broad_question(question, g):
     else:
         if re.search("How", question):
             name = (question.split("?")[0]).split(" ")
-            name = "_".join(name[6:])  # TODO why not [-1:]?
-            q = "select * where { ?e" + " <" + ONTOLOGY_PREFIX + "president_where_born>" + " " \
-                + " <" + ONTOLOGY_PREFIX + name + "> . }"
-
+            name = "_".join(name[6:])
+            q = "select * where { <" + ONTOLOGY_PREFIX + name + ">" + " <" + ONTOLOGY_PREFIX + "president_where_born> ?x }"
     return q

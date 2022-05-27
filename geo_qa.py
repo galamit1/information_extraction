@@ -2,14 +2,13 @@ import sys
 from answer_question import *
 
 
+
 def main():
     if len(sys.argv) == 2:
         if sys.argv[1] != "create":
             print("Wrong input!")
             return
         create_ontology()
-        # TODO: fix in the end
-        #dummy_create_ontology()
         return
 
     if len(sys.argv) == 3:
