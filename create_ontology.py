@@ -2,6 +2,7 @@ import requests
 import lxml.html
 import rdflib
 import re
+import urllib
 
 LIST_OF_COUNTRIES_URL = "https://en.wikipedia.org/wiki/List_of_countries_by_population_(United_Nations)"
 WIKIPEDIA_URL_PREFIX = "https://en.wikipedia.org"
@@ -17,6 +18,9 @@ def get_countries():
 
 
 def create_ontology_entity(entity):
+    entity = urllib.parse.unquote(entity, encoding='utf-8', errors='ignore')
+    entity = entity.replace(" ", "_")
+    entity = entity.replace('"', "")
     return rdflib.URIRef(ONTOLOGY_PREFIX + entity)
 
 
@@ -41,16 +45,23 @@ def create_ontology():
         if country_infobox == -1:
             continue
 
-        president = country_infobox.xpath("//tr[th//a[text() = 'President']]/td//a/@href")
-        prime_minister = country_infobox.xpath("//tr[th//a[text() = 'Prime Minister']]/td//a/@href")
+        president = country_infobox.xpath("//tr[th//a[text() = 'President']]/td//a/@href") or country_infobox.xpath("//tr[th[contains(., 'President')]]/td//a/@href")
+        prime_minister = country_infobox.xpath("//tr[th//a[text() = 'Prime Minister']]/td//a/@href") or country_infobox.xpath("//tr[th[contains(., 'Prime Minister')]]/td//a/@href")
         population = country_infobox.xpath("//tr[th[contains(., 'census')]]/td//text()")
         area = country_infobox.xpath("//tr[th[contains(., 'Total')]]/td//text()")
         gov = country_infobox.xpath("//tr[th[contains(., 'Government')]]/td//a/@href")
         capital = country_infobox.xpath("//tr[th[contains(., 'Capital')]]/td//a/@href")
 
         if len(population) == 0:
-            population = country_infobox.xpath("//tr[th[*[contains(., 'estimate')]]]/td//text()")
-            population = [x for x in population if re.search("(?=.*\d+)(?=. *[,].*)", str(x))]
+            for keyword in ["estimate", "Estimate", "population", "Population", "Census"]:
+                population = country_infobox.xpath("//tr[th[*[contains(., '{}')]]]/td//text()".format(keyword))
+                population = [x for x in population if re.search("(?=.*\d+)(?=. *[,].*)", str(x))]
+                if len(population) != 0:
+                    break
+
+        missing = list(filter(lambda x: x == "" or x == [], [president, prime_minister, population, area, gov, capital]))
+        if len(missing) > 0:
+            print(country + " missing " + str([president, prime_minister, population, area, gov, capital]))
 
         country_entity = create_ontology_entity(country)
 
