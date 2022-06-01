@@ -53,15 +53,8 @@ def create_ontology():
         capital = country_infobox.xpath("//tr[th[contains(., 'Capital')]]/td//a/@href")
 
         if len(population) == 0:
-            for keyword in ["estimate", "Estimate", "population", "Population", "Census"]:
-                population = country_infobox.xpath("//tr[th[*[contains(., '{}')]]]/td//text()".format(keyword))
-                population = [x for x in population if re.search("(?=.*\d+)(?=. *[,].*)", str(x))]
-                if len(population) != 0:
-                    break
-
-        missing = list(filter(lambda x: x == "" or x == [], [president, prime_minister, population, area, gov, capital]))
-        if len(missing) > 0:
-            print(country + " missing " + str([president, prime_minister, population, area, gov, capital]))
+            population = country_infobox.xpath("//tr[th[*[contains(., 'estimate')]]]/td//text()")
+            population = [x for x in population if re.search("(?=.*\d+)(?=. *[,].*)", str(x))]
 
         country_entity = create_ontology_entity(country)
 
@@ -150,4 +143,4 @@ def create_ontology():
             ontology_graph.add(
                 (name_entity, capital_entity, country_entity))
 
-    ontology_graph.serialize(ONTOLOGY_PATH, format="nt")
+    ontology_graph.serialize(ONTOLOGY_PATH, format="nt", encoding="utf-8", errors="ignore")
