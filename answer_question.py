@@ -85,14 +85,14 @@ def specific_question(question):
     if re.search("born", question):
         if re.search("president", question):
             if re.search("When", question):
-                country = country = normalize_name(question, 5, -1)
+                country = normalize_name(question, 5, -1)
                 attribute = "president_when_born>"
             if re.search("Where", question):
-                country = country = normalize_name(question, 5, -1)
+                country = normalize_name(question, 5, -1)
                 attribute = "president_where_born>"
         else:
             if re.search("When", question):
-                country = country = normalize_name(question, 6, -1)
+                country = normalize_name(question, 6, -1)
                 attribute = "prime_when_born>"
             elif re.search("Where", question):
                 country = normalize_name(question, 6, -1)
